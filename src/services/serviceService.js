@@ -3,7 +3,7 @@
 // algo que o banco não está preparado para receber.
 
 import { serviceRepository } from '../respositories/serviceRepository.js';
-1
+
 export const serviceService = {
     //1. Não precisa de velidação, pois aqui eu apenas estou buscando os dados.
     async getAllServices() {

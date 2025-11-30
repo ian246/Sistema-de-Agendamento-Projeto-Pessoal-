@@ -24,7 +24,7 @@ export const serviceController = {
         try {
             // 1. Extrair dados do body
             const { title, description, price, duration } = req.body;
-            const createdService = serviceService.createService(title, description, price, duration);
+            const createdService = await serviceService.createService(title, description, price, duration);
             return res.status(201).json(createdService);
         } catch (error) {
             return res.status(500).json({ error: error.message })

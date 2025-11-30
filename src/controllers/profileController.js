@@ -5,8 +5,8 @@ export const profileController = {
     async updateProfile(req, res) {
         try {
             const { id } = req.params;
-            const { phone, fullname } = req.body;
-            const updateProfile = await profileService.updateProfile(id, phone, fullname)
+            const { phone, full_name } = req.body;
+            const updateProfile = await profileService.updateProfile(id, phone, full_name)
             return res.status(200).json(updateProfile)
 
         } catch (error) {

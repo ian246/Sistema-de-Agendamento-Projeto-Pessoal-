@@ -3,6 +3,7 @@
 
 import express from 'express';
 import cors from 'cors';
+import serviceRoutes from './routes/serviceRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js'; // Correção do erro, adicionando 
 // o caminho completo com o .js
 
@@ -14,7 +15,7 @@ app.use(express.json());
 
 //Routes
 app.use('/api/appointments', appointmentRoutes);
-
+app.use('/api/services', serviceRoutes)
 
 // Rota de teste
 app.get('/', (req, res) => { res.send("Api de Agendamento Rodando!") });

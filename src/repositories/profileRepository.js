@@ -1,6 +1,6 @@
 import { supabase } from '../config/supabaseClient.js';
 
-export const profileRespository = {
+export const profileRepository = {
 
     // Metodos que precisaremos criar
     // Buscar todos os Perfil que a Barbearia presta. findAll

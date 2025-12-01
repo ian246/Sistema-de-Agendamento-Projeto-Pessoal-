@@ -2,7 +2,7 @@
 // findAll e create, teremos validações simples para que o usuario não crie
 // algo que o banco não está preparado para receber.
 
-import { serviceRepository } from '../respositories/serviceRepository.js';
+import { serviceRepository } from '../repositories/serviceRepository.js';
 
 export const serviceService = {
     //1. Não precisa de velidação, pois aqui eu apenas estou buscando os dados.

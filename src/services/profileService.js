@@ -1,10 +1,10 @@
-import { profileRespository } from "../respositories/profileRepository.js";
+import { profileRepository } from "../repositories/profileRepository.js";
 
 export const profileService = {
 
     //1. Fazer busca de todos os prestadores de Serviço.
     async findAll() {
-        return profileRespository.findAllProviders();
+        return profileRepository.findAllProviders();
     },
 
     async updateProfile(id, phone, fullname) {
@@ -22,7 +22,7 @@ export const profileService = {
         if (phone) dataToUpdate.phone = phone;
 
         // 3. Chama o repositório
-        return await profileRespository.updateProfile(id, dataToUpdate);
+        return await profileRepository.updateProfile(id, dataToUpdate);
     },
 
 }

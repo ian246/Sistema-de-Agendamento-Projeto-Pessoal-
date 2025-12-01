@@ -1,13 +1,10 @@
 // Onde fica as rotas do Front-end e a URLs
 
 import express from 'express';
-// imports do controllers ⬇️⬇️⬇️
-// ...
-// ...
-// ...
+import { appointmentController } from '../controllers/appointmentController.js';
 
 const router = express.Router();
 
-router.get('/', (req, res) => { res.send("Rota de Agendamento Funcionando!") });
+router.post('/', appointmentController.create);
 
 export default router;

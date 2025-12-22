@@ -26,5 +26,22 @@ export const appointmentRepository = {
             .neq('status', 'cancelled');
         if (error) throw error;
         return data.length > 0;
-    }
+    },
+
+    //  21/12/2025 - Adicione dentro do objeto appointmentRepository
+
+    async findByClientId(clientId) {
+        const { data, error } = await supabase
+            .from('appointments')
+            .select(`
+        *,
+        provider:profiles!appointments_provider_id_fkey (full_name),
+        service:services (title)
+      `)
+            .eq('client_id', clientId)
+            .order('start_time', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    },
 };

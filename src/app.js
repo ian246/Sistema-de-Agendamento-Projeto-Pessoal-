@@ -1,5 +1,5 @@
 // Configura o Express
-//Aqui configuramos os middlewares (plugins) do servidor.
+
 
 import express from 'express';
 import cors from 'cors';

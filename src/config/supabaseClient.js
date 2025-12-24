@@ -6,6 +6,12 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const supabaseUrl = process.env.SUPABASE_URL;
+// GARANTA QUE O NOME AQUI É IGUAL AO DO .ENV
 const supabaseKey = process.env.SUPABASE_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+        persistSession: false, // Boa prática para backend
+        autoRefreshToken: false,
+    }
+});

@@ -8,12 +8,13 @@ export const appointmentRepository = {
         const { data, error } = await supabase
             .from('appointments')
             .insert([appointmentData])
-            .select('*')
-            .single();
+            .select('*'); // Remove .single() to avoid error
+
         if (error) {
             throw new Error(error.message)
         }
-        return data;
+        // Return the first element since insert with array returns an array
+        return data[0];
     },
 
     async hasConflict(providerId, startTime, endTime) {

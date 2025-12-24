@@ -1,4 +1,4 @@
-// Onde fica as regras de negócio pesada
+
 
 import { appointmentRepository } from '../repositories/appointmentRepository.js';
 import { serviceRepository } from '../repositories/serviceRepository.js';
@@ -35,14 +35,18 @@ export const appointmentService = {
             client_id: clientId,
             provider_id: providerId,
             service_id: serviceId,
-            start_time: startTime.toISOString(), // Salva no padrão ISO
-            end_time: endTime.toISOString(), // Salva no padrão ISO
+            start_time: startTime.toISOString(),
+            end_time: endTime.toISOString(),
             price: service.price,
             status: 'confirmed'
         };
 
         return appointmentRepository.create(appointmentData);
 
+    },
+
+    async listMyAppointments(clientId) {
+        return appointmentRepository.findByClientId(clientId);
     }
 
 }

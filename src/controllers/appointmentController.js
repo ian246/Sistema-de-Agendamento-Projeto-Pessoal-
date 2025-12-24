@@ -21,15 +21,12 @@ export const appointmentController = {
             return res.status(400).json({ error: error.message });
         }
     },
-    // 21/12/2025 - Adicione a nova rota
+
     async listMyAppointments(req, res) {
         try {
-            const { client_id } = req.params; // Pega o ID da URL
+            const { client_id } = req.params;
 
-            // Importe o repositório se necessário, ou use o Service
-            const { appointmentRepository } = await import('../repositories/appointmentRepository.js');
-
-            const appointments = await appointmentRepository.findByClientId(client_id);
+            const appointments = await appointmentService.listMyAppointments(client_id);
             return res.status(200).json(appointments);
         } catch (error) {
             return res.status(500).json({ error: error.message });

@@ -11,12 +11,12 @@ export const profileRepository = {
         const { data, error } = await supabase
             .from('profiles')
             .select('*') // GET
-            .eq('id', id)
-            .single();
+            .eq('id', id);
+        // .single();
         if (error) {
             throw new Error(error.message);
         }
-        return data;
+        return data[0];
 
     },
     async findAllProviders() {
@@ -37,11 +37,11 @@ export const profileRepository = {
             .from('profiles')
             .update(updateData) // PUT
             .eq('id', id)
-            .select()
-            .single();
+            .select();
+        // .single();
         if (error) {
             throw new Error(error.message);
-        } return data;
+        } return data[0];
     },
 
 

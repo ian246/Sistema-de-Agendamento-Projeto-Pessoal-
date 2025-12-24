@@ -7,6 +7,7 @@ import profileRoutes from './routes/profileRoutes.js';
 import serviceRoutes from './routes/serviceRoutes.js';
 import appointmentRoutes from './routes/appointmentRoutes.js'; // Correção do erro, adicionando 
 // o caminho completo com o .js
+import authRoutes from './routes/authRoutes.js';
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/services', serviceRoutes)
 app.use('/api/profiles', profileRoutes)
+app.use('/api/auth', authRoutes);
 
 // Rota de teste
 app.get('/', (req, res) => { res.send("Api de Agendamento Rodando!") });

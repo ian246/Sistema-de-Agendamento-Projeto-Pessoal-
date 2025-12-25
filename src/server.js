@@ -9,4 +9,14 @@ dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 
-app.listen(PORT, () => { console.log(`🚀 Server is running on port ${PORT}`); });
+app.listen(PORT, () => {
+    console.log('='.repeat(50));
+    console.log(`🚀 Server is running on port ${PORT}`);
+    console.log(`🌍 Local: http://localhost:${PORT}`);
+    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
+    console.log(`⏰ Started at: ${new Date().toLocaleString('pt-BR')}`);
+    console.log('='.repeat(50));
+}).on('error', (err) => {
+    console.error('❌ Erro ao iniciar servidor:', err.message);
+    process.exit(1);
+});

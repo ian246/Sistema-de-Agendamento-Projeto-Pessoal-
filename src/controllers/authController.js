@@ -39,32 +39,55 @@ export const authController = {
     },
 
     // --- CADASTRO (REGISTER) ---
-    // Útil se você quiser criar usuários pelo Postman/App
     async register(req, res) {
         try {
-            const { email, password, name } = req.body;
+            // Agora esperamos receber nome, telefone e se é barbeiro ou cliente
+            const { email, password, name, phone, role } = req.body;
 
-            if (!email || !password) {
-                return res.status(400).json({ error: 'Email e senha obrigatórios' });
+            if (!email || !password || !name) {
+                return res.status(400).json({ error: 'Email, senha e nome são obrigatórios' });
             }
 
-            const { data, error } = await supabase.auth.signUp({
+            // 1. Cria login no Supabase Auth
+            const { data: authData, error: authError } = await supabase.auth.signUp({
                 email,
                 password,
-                options: {
-                    data: { name: name || '' } // Salva o nome nos metadados do usuário
+            });
+
+            if (authError) return res.status(400).json({ error: authError.message });
+
+            if (authData.user) {
+                // 2. CORREÇÃO AQUI: Usamos UPSERT para vencer o Trigger
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .upsert({
+                        id: authData.user.id,        // O ID obrigatoriamente igual ao Auth
+                        email: email,
+                        full_name: name,
+                        phone: phone ? String(phone) : null, // Converte número para texto para não dar erro
+                        role: role || 'client',
+                        avatar_url: null,
+                        updated_at: new Date()       // Marca a hora da atualização
+                    });
+
+                if (profileError) {
+                    console.error("Erro perfil:", profileError);
+                    return res.status(400).json({ error: "Erro ao criar perfil detalhado: " + profileError.message });
                 }
-            });
 
-            if (error) throw error;
-
-            return res.status(201).json({
-                message: 'Usuário criado com sucesso!',
-                user: data.user
-            });
-
+                return res.status(201).json({
+                    message: 'Usuário cadastrado com sucesso!',
+                    user: {
+                        id: authData.user.id,
+                        email,
+                        name,
+                        role: role || 'client'
+                    }
+                });
+            }
         } catch (error) {
-            return res.status(400).json({ error: error.message });
+            console.error(error);
+            return res.status(500).json({ error: 'Erro interno' });
         }
     }
 };

@@ -1,14 +1,23 @@
 import express from 'express';
 import { serviceController } from '../controllers/serviceController.js';
+import { authenticateToken, checkIsProvider } from '../middlewares/authMiddleware.js';
 
-//1. Instancia do express para eu fazer a busca com o servidor
 const router = express.Router();
 
-//2. Propriedades do Express para fazer o get e o post
-router.get('/', serviceController.listServices);
-router.post('/', serviceController.create);
+// --- ROTAS PÚBLICAS (Ou só autenticadas para clientes) ---
+// Cliente clica no Roberto (ID 123) e quer ver os serviços dele:
+router.get('/provider/:providerId', authenticateToken, serviceController.getServicesByProviderId);
+
+
+// --- ROTAS DO PRESTADOR (Blindadas pelo Middleware) ---
+
+// Criar novo serviço (Ex: Roberto cria "Pezinho" por R$20)
+router.post('/', authenticateToken, checkIsProvider, serviceController.createService);
+
+// Ver todos os serviços que EU criei (Para o Dashboard)
+router.get('/me', authenticateToken, checkIsProvider, serviceController.getMyServices);
+
+// Deletar um serviço meu
+router.delete('/:id', authenticateToken, checkIsProvider, serviceController.deleteService);
 
 export default router;
-
-//Flux
-// Routes => Controller => Service => repository => Config

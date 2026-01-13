@@ -1,4 +1,4 @@
-import { supabase } from '../config/supabaseClient.js';
+import { createClient } from '@supabase/supabase-js';
 
 export const serviceController = {
 
@@ -12,7 +12,23 @@ export const serviceController = {
                 return res.status(400).json({ error: "Nome e Preço são obrigatórios." });
             }
 
-            const { data, error } = await supabase
+            // CRIA UM CLIENTE SUPABASE COM O TOKEN DO USUÁRIO
+            // Isso garante que o Supabase saiba QUEM está fazendo o insert e respeite o RLS.
+            const supabaseUrl = process.env.SUPABASE_URL;
+            const supabaseKey = process.env.SUPABASE_KEY;
+
+            // Pega o token do header (ex: "Bearer eyJ...")
+            const authHeader = req.headers.authorization;
+
+            const supabaseClient = createClient(supabaseUrl, supabaseKey, {
+                global: {
+                    headers: {
+                        Authorization: authHeader,
+                    },
+                },
+            });
+
+            const { data, error } = await supabaseClient
                 .from('services')
                 .insert([{
                     name,
@@ -28,8 +44,13 @@ export const serviceController = {
             return res.status(201).json({ message: "Serviço criado com sucesso!", service: data[0] });
 
         } catch (error) {
-            console.error(error);
-            return res.status(500).json({ error: "Erro ao criar serviço." });
+            console.error("Erro no createService:", error);
+            console.log("req.user content:", req.user);
+            return res.status(500).json({
+                error: "Erro ao criar serviço.",
+                details: error.message || error,
+                user_id_attempt: req.user?.id
+            });
         }
     },
 

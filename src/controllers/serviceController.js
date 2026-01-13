@@ -34,7 +34,7 @@ export const serviceController = {
                     name,
                     description,
                     price: parseFloat(price),
-                    duration: parseInt(duration || 30), // Duração padrão de 30min
+                    duration_minutes: parseInt(duration || 30), // Duração padrão de 30min
                     provider_id: provider_id // Salva que esse serviço é DESTE usuário
                 }])
                 .select();

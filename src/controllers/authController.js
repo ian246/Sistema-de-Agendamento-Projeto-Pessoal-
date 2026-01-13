@@ -21,14 +21,22 @@ export const authController = {
                 return res.status(401).json({ error: 'Email ou senha inválidos' });
             }
 
-            // Sucesso! Retorna o token e os dados do usuário
+            // NOVO: Buscar o profile para pegar o role
+            const { data: profile, error: profileError } = await supabase
+                .from('profiles')
+                .select('full_name, role')
+                .eq('id', data.user.id)
+                .single();
+
+            // Sucesso! Retorna o token e os dados do usuário COM O ROLE
             return res.status(200).json({
                 message: 'Login realizado com sucesso',
                 token: data.session.access_token,
                 user: {
                     id: data.user.id,
                     email: data.user.email,
-                    name: data.user.user_metadata?.name // Pega o nome se tiver salvo
+                    name: profile?.full_name || data.user.user_metadata?.name,
+                    role: profile?.role || 'client' // Default para client se não achar
                 }
             });
 

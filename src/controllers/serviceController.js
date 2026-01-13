@@ -5,11 +5,15 @@ export const serviceController = {
     // 1. CRIAR SERVIÇO (Só para Providers)
     async createService(req, res) {
         try {
-            const { name, description, price, duration } = req.body;
+            // CORREÇÃO: O banco usa 'title', não 'name'
+            const { title, name, description, price, duration } = req.body;
             const provider_id = req.user.id; // <--- Pegamos do Token.
 
-            if (!name || !price) {
-                return res.status(400).json({ error: "Nome e Preço são obrigatórios." });
+            // Aceita tanto 'title' quanto 'name' do frontend (compatibilidade)
+            const serviceTitle = title || name;
+
+            if (!serviceTitle || !price) {
+                return res.status(400).json({ error: "Nome/Título e Preço são obrigatórios." });
             }
 
             // CRIA UM CLIENTE SUPABASE COM O TOKEN DO USUÁRIO
@@ -31,7 +35,7 @@ export const serviceController = {
             const { data, error } = await supabaseClient
                 .from('services')
                 .insert([{
-                    name,
+                    title: serviceTitle, // CORRIGIDO: Usa 'title' que é o nome real da coluna
                     description,
                     price: parseFloat(price),
                     duration_minutes: parseInt(duration || 30), // Duração padrão de 30min

@@ -22,6 +22,9 @@ export default (sequelize, DataTypes) => {
         full_name: DataTypes.STRING,
         phone: DataTypes.STRING,
         avatar_url: DataTypes.STRING,
+        salon_name: DataTypes.STRING,
+        address: DataTypes.STRING,
+        salon_image_url: DataTypes.STRING,
         role: {
             type: DataTypes.STRING,
             defaultValue: 'client'

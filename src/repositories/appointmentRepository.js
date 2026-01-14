@@ -29,8 +29,6 @@ export const appointmentRepository = {
         return data.length > 0;
     },
 
-    //  21/12/2025 - Adicione dentro do objeto appointmentRepository
-
     async findByClientId(clientId) {
         const { data, error } = await supabase
             .from('appointments')
@@ -40,6 +38,31 @@ export const appointmentRepository = {
         service:services (title)
       `)
             .eq('client_id', clientId)
+            .order('start_time', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    },
+
+    // Busca agendamentos do provider com dados do cliente e serviço
+    async findByProviderId(providerId) {
+        const { data, error } = await supabase
+            .from('appointments')
+            .select(`
+                *,
+                client:profiles!appointments_client_id_fkey (
+                    id,
+                    full_name,
+                    phone
+                ),
+                service:services (
+                    id,
+                    name,
+                    price,
+                    duration
+                )
+            `)
+            .eq('provider_id', providerId)
             .order('start_time', { ascending: false });
 
         if (error) throw error;

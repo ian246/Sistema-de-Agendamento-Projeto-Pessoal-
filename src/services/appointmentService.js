@@ -47,6 +47,11 @@ export const appointmentService = {
 
     async listMyAppointments(clientId) {
         return appointmentRepository.findByClientId(clientId);
+    },
+
+    // Lista agendamentos do provider
+    async listProviderAppointments(providerId) {
+        return appointmentRepository.findByProviderId(providerId);
     }
 
 }

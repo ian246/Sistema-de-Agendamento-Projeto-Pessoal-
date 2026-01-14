@@ -31,5 +31,17 @@ export const appointmentController = {
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
+    },
+
+    // GET /api/appointments/provider/me - Lista agendamentos do provider logado
+    async getProviderAppointments(req, res) {
+        try {
+            const providerId = req.user.id;
+
+            const appointments = await appointmentService.listProviderAppointments(providerId);
+            return res.status(200).json(appointments);
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 };

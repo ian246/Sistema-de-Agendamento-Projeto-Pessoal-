@@ -57,9 +57,9 @@ export const appointmentRepository = {
                 ),
                 service:services (
                     id,
-                    name,
+                    title,
                     price,
-                    duration
+                    duration_minutes
                 )
             `)
             .eq('provider_id', providerId)

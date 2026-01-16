@@ -68,4 +68,33 @@ export const appointmentRepository = {
         if (error) throw error;
         return data;
     },
+
+    // Busca agendamentos de um provider em uma data específica (para verificar horários ocupados)
+    async findByProviderIdAndDate(providerId, date) {
+        // Cria range do dia: 00:00:00 até 23:59:59
+        const startOfDay = `${date}T00:00:00.000Z`;
+        const endOfDay = `${date}T23:59:59.999Z`;
+
+        const { data, error } = await supabase
+            .from('appointments')
+            .select(`
+                id,
+                start_time,
+                end_time,
+                status,
+                service:services (
+                    id,
+                    title,
+                    duration_minutes
+                )
+            `)
+            .eq('provider_id', providerId)
+            .gte('start_time', startOfDay)
+            .lte('start_time', endOfDay)
+            .neq('status', 'cancelled')
+            .order('start_time', { ascending: true });
+
+        if (error) throw error;
+        return data;
+    },
 };

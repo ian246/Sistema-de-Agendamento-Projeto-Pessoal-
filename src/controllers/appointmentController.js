@@ -45,5 +45,30 @@ export const appointmentController = {
         } catch (error) {
             return res.status(500).json({ error: error.message });
         }
+    },
+
+    // GET /api/appointments/provider/:providerId/date/:date - Horários ocupados para booking
+    async getAppointmentsByProviderAndDate(req, res) {
+        try {
+            const { providerId, date } = req.params;
+
+            console.log(`[DEBUG] Buscando agendamentos - Provider: ${providerId}, Date: ${date}`);
+
+            // Valida formato da data (YYYY-MM-DD)
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+            if (!dateRegex.test(date)) {
+                return res.status(400).json({ error: 'Formato de data inválido. Use YYYY-MM-DD' });
+            }
+
+            const appointments = await appointmentService.getAppointmentsByProviderAndDate(providerId, date);
+
+            console.log(`[DEBUG] Agendamentos encontrados: ${appointments.length}`);
+            console.log('[DEBUG] Dados:', JSON.stringify(appointments, null, 2));
+
+            return res.status(200).json(appointments);
+        } catch (error) {
+            console.error('[DEBUG] Erro:', error.message);
+            return res.status(500).json({ error: error.message });
+        }
     }
 };

@@ -54,6 +54,11 @@ export const appointmentService = {
     // Lista agendamentos do provider
     async listProviderAppointments(providerId) {
         return appointmentRepository.findByProviderId(providerId);
+    },
+
+    // Busca agendamentos de um provider em uma data específica (para booking)
+    async getAppointmentsByProviderAndDate(providerId, date) {
+        return appointmentRepository.findByProviderIdAndDate(providerId, date);
     }
 
 }

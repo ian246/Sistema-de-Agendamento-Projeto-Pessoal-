@@ -63,15 +63,36 @@ export const serviceController = {
     async getMyServices(req, res) {
         try {
             const myId = req.user.id;
+            const supabaseUrl = process.env.SUPABASE_URL;
+            const supabaseKey = process.env.SUPABASE_KEY;
+            const authHeader = req.headers.authorization;
 
-            const { data, error } = await supabase
+            const supabaseClient = createClient(supabaseUrl, supabaseKey, {
+                global: { headers: { Authorization: authHeader } },
+            });
+
+            const { data, error } = await supabaseClient
                 .from('services')
-                .select('*')
-                .eq('provider_id', myId); // Filtra só o que é meu
+                .select('*, appointments(count)')
+                .eq('provider_id', myId);
 
             if (error) throw error;
 
-            return res.json(data);
+            // Map the result to include appointment_count properly
+            const servicesWithCount = data.map(service => {
+                // If appointments is an array, take the first element (which has the count)
+                // If it's empty, count is 0
+                const appInfo = (service.appointments && service.appointments.length > 0)
+                    ? service.appointments[0]
+                    : null;
+
+                return {
+                    ...service,
+                    appointment_count: appInfo ? appInfo.count : 0
+                };
+            });
+
+            return res.json(servicesWithCount);
         } catch (error) {
             return res.status(500).json({ error: "Erro ao buscar serviços." });
         }
@@ -143,9 +164,16 @@ export const serviceController = {
         try {
             const { id } = req.params;
             const providerId = req.user.id;
+            const supabaseUrl = process.env.SUPABASE_URL;
+            const supabaseKey = process.env.SUPABASE_KEY;
+            const authHeader = req.headers.authorization;
+
+            const supabaseClient = createClient(supabaseUrl, supabaseKey, {
+                global: { headers: { Authorization: authHeader } },
+            });
 
             // Verificar se o serviço pertence ao provider
-            const { data: existingService, error: fetchError } = await supabase
+            const { data: existingService, error: fetchError } = await supabaseClient
                 .from('services')
                 .select('*')
                 .eq('id', id)
@@ -156,8 +184,22 @@ export const serviceController = {
                 return res.status(404).json({ error: 'Serviço não encontrado' });
             }
 
+            // Verificar se existem agendamentos para este serviço
+            const { count, error: countError } = await supabaseClient
+                .from('appointments')
+                .select('*', { count: 'exact', head: true })
+                .eq('service_id', id);
+
+            if (countError) throw countError;
+
+            if (count > 0) {
+                return res.status(400).json({
+                    error: 'Não é possível excluir um serviço que possui agendamentos associados.'
+                });
+            }
+
             // Deletar serviço
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from('services')
                 .delete()
                 .eq('id', id);

@@ -75,9 +75,16 @@ export const appointmentService = {
         }
 
         // 3. Verificar permissão
-        // Apenas o provider dono do agendamento pode alterar o status (por enquanto)
-        if (appointment.provider_id !== userId) {
+        const isProvider = appointment.provider_id === userId;
+        const isClient = appointment.client_id === userId;
+
+        if (!isProvider && !isClient) {
             throw new Error('Você não tem permissão para alterar este agendamento');
+        }
+
+        // Se for o cliente, só pode cancelar
+        if (isClient && status !== 'cancelled') {
+            throw new Error('Clientes só podem cancelar agendamentos');
         }
 
         // 4. Se for aceitar/recusar, verificar se transição faz sentido

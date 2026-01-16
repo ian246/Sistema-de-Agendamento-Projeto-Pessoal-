@@ -5,7 +5,7 @@ import { serviceRepository } from '../repositories/serviceRepository.js';
 
 
 export const appointmentService = {
-    async createAppointment(clientId, providerId, serviceId, startTimeString) {
+    async createAppointment(clientId, providerId, serviceId, startTimeString, cutDescription = null, referenceImageUrl = null) {
         const startTime = new Date(startTimeString);
 
         if (Number.isNaN(startTime.getTime())) {
@@ -38,7 +38,9 @@ export const appointmentService = {
             start_time: startTime.toISOString(),
             end_time: endTime.toISOString(),
             price: service.price,
-            status: 'confirmed'
+            status: 'confirmed',
+            cut_description: cutDescription,
+            reference_image_url: referenceImageUrl
         };
 
         return appointmentRepository.create(appointmentData);

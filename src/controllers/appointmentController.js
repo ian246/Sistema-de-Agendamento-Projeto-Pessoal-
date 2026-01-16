@@ -4,13 +4,15 @@ import { appointmentService } from '../services/appointmentService.js';
 export const appointmentController = {
     async create(req, res) {
         try {
-            const { client_id, provider_id, service_id, start_time } = req.body;
+            const { client_id, provider_id, service_id, start_time, cut_description, reference_image_url } = req.body;
 
             const appointment = await appointmentService.createAppointment(
                 client_id,
                 provider_id,
                 service_id,
-                start_time
+                start_time,
+                cut_description,
+                reference_image_url
             );
 
             return res.status(201).json(appointment);

@@ -17,6 +17,9 @@ router.post('/', authenticateToken, checkIsProvider, serviceController.createSer
 // Ver todos os serviços que EU criei (Para o Dashboard)
 router.get('/me', authenticateToken, checkIsProvider, serviceController.getMyServices);
 
+// Atualizar um serviço meu
+router.put('/:id', authenticateToken, checkIsProvider, serviceController.updateService);
+
 // Deletar um serviço meu
 router.delete('/:id', authenticateToken, checkIsProvider, serviceController.deleteService);
 

@@ -95,23 +95,79 @@ export const serviceController = {
         }
     },
 
-    // 4. DELETAR SERVIÇO (Segurança extra: só deleta se for dono)
-    async deleteService(req, res) {
+    // 4. ATUALIZAR SERVIÇO (PUT /api/services/:id)
+    async updateService(req, res) {
         try {
             const { id } = req.params;
-            const myId = req.user.id;
+            const { title, price, duration, description } = req.body;
+            const providerId = req.user.id;
 
-            const { error } = await supabase
+            // Verificar se o serviço pertence ao provider
+            const { data: existingService, error: fetchError } = await supabase
                 .from('services')
-                .delete()
+                .select('*')
                 .eq('id', id)
-                .eq('provider_id', myId); // Garante que ninguém delete serviço dos outros
+                .eq('provider_id', providerId)
+                .single();
+
+            if (fetchError || !existingService) {
+                return res.status(404).json({ error: 'Serviço não encontrado' });
+            }
+
+            // Preparar objeto de atualização
+            const updateData = {};
+            if (title !== undefined) updateData.title = title;
+            if (price !== undefined) updateData.price = parseFloat(price);
+            if (duration !== undefined) updateData.duration_minutes = parseInt(duration);
+            if (description !== undefined) updateData.description = description;
+
+            // Atualizar serviço
+            const { data, error } = await supabase
+                .from('services')
+                .update(updateData)
+                .eq('id', id)
+                .select()
+                .single();
 
             if (error) throw error;
 
-            return res.json({ message: "Serviço removido." });
+            return res.json(data);
         } catch (error) {
-            return res.status(500).json({ error: "Erro ao deletar serviço." });
+            console.error('Erro no updateService:', error);
+            return res.status(500).json({ error: error.message });
+        }
+    },
+
+    // 5. DELETAR SERVIÇO (Verifica propriedade antes de deletar)
+    async deleteService(req, res) {
+        try {
+            const { id } = req.params;
+            const providerId = req.user.id;
+
+            // Verificar se o serviço pertence ao provider
+            const { data: existingService, error: fetchError } = await supabase
+                .from('services')
+                .select('*')
+                .eq('id', id)
+                .eq('provider_id', providerId)
+                .single();
+
+            if (fetchError || !existingService) {
+                return res.status(404).json({ error: 'Serviço não encontrado' });
+            }
+
+            // Deletar serviço
+            const { error } = await supabase
+                .from('services')
+                .delete()
+                .eq('id', id);
+
+            if (error) throw error;
+
+            return res.status(200).json({ message: 'Serviço deletado com sucesso' });
+        } catch (error) {
+            console.error('Erro no deleteService:', error);
+            return res.status(500).json({ error: error.message });
         }
     }
 };

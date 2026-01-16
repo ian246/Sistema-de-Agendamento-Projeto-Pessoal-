@@ -74,10 +74,10 @@ export const appointmentController = {
     async updateStatus(req, res) {
         try {
             const { id } = req.params;
-            const { status } = req.body;
+            const { status, cancellation_reason } = req.body;
             const userId = req.user.id;
 
-            const updatedAppointment = await appointmentService.updateAppointmentStatus(id, status, userId);
+            const updatedAppointment = await appointmentService.updateAppointmentStatus(id, status, userId, cancellation_reason);
 
             return res.status(200).json(updatedAppointment);
         } catch (error) {

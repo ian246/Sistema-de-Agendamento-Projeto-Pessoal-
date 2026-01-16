@@ -97,10 +97,15 @@ export const appointmentRepository = {
         if (error) throw error;
         return data;
     },
-    async updateStatus(id, status) {
+    async updateStatus(id, status, cancellation_reason = null) {
+        const updateData = { status };
+        if (cancellation_reason !== null) {
+            updateData.cancellation_reason = cancellation_reason;
+        }
+
         const { data, error } = await supabase
             .from('appointments')
-            .update({ status })
+            .update(updateData)
             .eq('id', id)
             .select()
             .single();

@@ -10,6 +10,9 @@ router.get('/provider/me', authenticateToken, checkIsProvider, appointmentContro
 // Rota pública para cliente ver horários ocupados de um provider em uma data específica
 router.get('/provider/:providerId/date/:date', authenticateToken, appointmentController.getAppointmentsByProviderAndDate);
 
+// Atualizar status (Aceitar/Recusar/Cancelar)
+router.patch('/:id/status', authenticateToken, appointmentController.updateStatus);
+
 // Rotas existentes
 router.post('/', appointmentController.create);
 router.get('/client/:client_id', appointmentController.listMyAppointments);

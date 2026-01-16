@@ -38,7 +38,7 @@ export const appointmentService = {
             start_time: startTime.toISOString(),
             end_time: endTime.toISOString(),
             price: service.price,
-            status: 'confirmed',
+            status: 'pending',
             cut_description: cutDescription,
             reference_image_url: referenceImageUrl
         };
@@ -59,6 +59,34 @@ export const appointmentService = {
     // Busca agendamentos de um provider em uma data específica (para booking)
     async getAppointmentsByProviderAndDate(providerId, date) {
         return appointmentRepository.findByProviderIdAndDate(providerId, date);
-    }
+    },
 
+    async updateAppointmentStatus(appointmentId, status, userId) {
+        // 1. Validar status
+        const validStatuses = ['pending', 'confirmed', 'completed', 'cancelled'];
+        if (!validStatuses.includes(status)) {
+            throw new Error('Status inválido. Use: ' + validStatuses.join(', '));
+        }
+
+        // 2. Buscar agendamento
+        const appointment = await appointmentRepository.findById(appointmentId);
+        if (!appointment) {
+            throw new Error('Agendamento não encontrado');
+        }
+
+        // 3. Verificar permissão
+        // Apenas o provider dono do agendamento pode alterar o status (por enquanto)
+        // TODO: Permitir que o cliente cancele também se necessário
+        if (appointment.provider_id !== userId) {
+            throw new Error('Você não tem permissão para alterar este agendamento');
+        }
+
+        // 4. Se for aceitar/recusar, verificar se transição faz sentido
+        // Ex: Não dá pra aceitar um cancelado
+        if (appointment.status === 'cancelled') {
+            throw new Error('Não é possível alterar um agendamento cancelado');
+        }
+
+        return appointmentRepository.updateStatus(appointmentId, status);
+    }
 }

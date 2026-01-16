@@ -97,4 +97,31 @@ export const appointmentRepository = {
         if (error) throw error;
         return data;
     },
+    async updateStatus(id, status) {
+        const { data, error } = await supabase
+            .from('appointments')
+            .update({ status })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
+    },
+
+    async findById(id) {
+        const { data, error } = await supabase
+            .from('appointments')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (error) {
+            // Supabase returns a specific error code for no rows found, usually 'PGRST116'
+            // checking if data is null or error is enough context
+            if (error.code === 'PGRST116') return null;
+            throw error;
+        }
+        return data;
+    }
 };

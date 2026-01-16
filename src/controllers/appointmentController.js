@@ -70,5 +70,18 @@ export const appointmentController = {
             console.error('[DEBUG] Erro:', error.message);
             return res.status(500).json({ error: error.message });
         }
+    },
+    async updateStatus(req, res) {
+        try {
+            const { id } = req.params;
+            const { status } = req.body;
+            const userId = req.user.id;
+
+            const updatedAppointment = await appointmentService.updateAppointmentStatus(id, status, userId);
+
+            return res.status(200).json(updatedAppointment);
+        } catch (error) {
+            return res.status(400).json({ error: error.message });
+        }
     }
 };

@@ -184,19 +184,32 @@ export const serviceController = {
                 return res.status(404).json({ error: 'Serviço não encontrado' });
             }
 
-            // Verificar se existem agendamentos para este serviço
-            const { count, error: countError } = await supabaseClient
+            // Verificar se existem agendamentos ATIVOS para este serviço
+            // Consideramos ativos tudo que NÃO for 'cancelled' ou 'cancelado'
+            const { count: activeCount, error: countError } = await supabaseClient
                 .from('appointments')
                 .select('*', { count: 'exact', head: true })
-                .eq('service_id', id);
+                .eq('service_id', id)
+                .neq('status', 'cancelled')
+                .neq('status', 'cancelado');
 
             if (countError) throw countError;
 
-            if (count > 0) {
+            if (activeCount > 0) {
                 return res.status(400).json({
-                    error: 'Não é possível excluir um serviço que possui agendamentos associados.'
+                    error: 'Não é possível excluir um serviço que possui agendamentos pendentes ou confirmados.'
                 });
             }
+
+            // Se chegou aqui, só tem agendamentos cancelados (ou nenhum).
+            // Precisamos deletar os agendamentos antes de deletar o serviço
+            // para não violar foreign key (caso não seja cascade).
+            const { error: deleteAptsError } = await supabaseClient
+                .from('appointments')
+                .delete()
+                .eq('service_id', id);
+
+            if (deleteAptsError) throw deleteAptsError;
 
             // Deletar serviço
             const { error } = await supabaseClient
@@ -206,7 +219,7 @@ export const serviceController = {
 
             if (error) throw error;
 
-            return res.status(200).json({ message: 'Serviço deletado com sucesso' });
+            return res.status(200).json({ message: 'Serviço e agendamentos cancelados removidos com sucesso' });
         } catch (error) {
             console.error('Erro no deleteService:', error);
             return res.status(500).json({ error: error.message });
